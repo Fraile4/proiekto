@@ -1,22 +1,75 @@
+import React, { useEffect } from 'react';
+//import React from 'react';
+
 import logo from './logo.svg';
 import './App.css';
+import { Board } from './components/Board';
+//import { Consulta } from './components/Consulta';
+import { Credits } from './components/Credits';
+const Groq = require("groq-sdk");
 
 function App() {
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const groq = new Groq({
+          apiKey: process.env.REACT_APP_GROQ_API_KEY,
+          dangerouslyAllowBrowser: true
+        });
+        const chatCompletion = await groq.chat.completions.create({
+          messages: [
+            {
+              role: "user",
+              content: "Explain the importance of fast language models"
+            }
+          ],
+          model: "Llama3-70b-8192"
+        });
+        console.log(chatCompletion.choices[0]?.message?.content || "");
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+    fetchData();
+  }, []); // Empty dependency array ensures that this effect runs only once, similar to componentDidMount
+
+  /**   
+  useEffect(() => {
+  async function fetchData(content) {
+    try {
+      const groq = new Groq({
+        apiKey: process.env.REACT_APP_GROQ_API_KEY,
+        dangerouslyAllowBrowser: true
+      });
+      const chatCompletion = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "user",
+            content: content // Pasamos el contenido como atributo
+          }
+        ],
+        model: "Llama3-70b-8192"
+      });
+      console.log(chatCompletion.choices[0]?.message?.content || "");
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
+  
+  // Llamamos a fetchData con el contenido del mensaje deseado
+  fetchData("Explain the importance of fast language models");
+}, []); // Empty dependency array ensures that this effect runs only once, similar to componentDidMount
+
+  */
+
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <div className="board-container">
+          <Board />
+        </div>
+        <Credits />
       </header>
     </div>
   );
